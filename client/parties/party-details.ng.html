@@ -11,8 +11,8 @@ Here you will see the details of party number: {{ partyId }}
 
 
 <ul>
-  Users:
-  <li ng-repeat="user in users">
+  Users to invite:
+  <li ng-repeat="user in users | uninvited:party">
     <div>{{ user.emails[0].address }}</div>
   </li>
 </ul>

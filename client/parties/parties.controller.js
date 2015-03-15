@@ -5,6 +5,8 @@ angular.module("socially").controller("PartiesListCtrl", ['$scope', '$meteor', '
 $scope.perPage = 3;
 $scope.sort = { name: 1 };
 
+$meteor.subscribe('users');
+
 $scope.orderProperty = '1';
 
     $scope.parties = $meteor.collection(function() {
@@ -41,6 +43,27 @@ $meteor.autorun($scope, function() {
     $scope.removeAll = function(){
   $scope.parties.remove();
 };
+
+
+$scope.getUserById = function(userId){
+  return Meteor.users.findOne(userId);
+};
+
+$scope.creator = function(party){
+  if (!party)
+    return;
+  var owner = $scope.getUserById(party.owner);
+  if (!owner)
+    return "nobody";
+
+  if ($rootScope.currentUser)
+    if ($rootScope.currentUser._id)
+      if (owner._id === $rootScope.currentUser._id)
+        return "me";
+
+  return owner;
+};
+
 
   }])
 .controller("PartyDetailsCtrl", ['$scope', '$stateParams', '$meteor','$rootScope',
