@@ -25,15 +25,32 @@ $scope.orderProperty = '1';
 };
 
 $meteor.autorun($scope, function() {
-
   $meteor.subscribe('parties', {
-  limit: parseInt($scope.getReactively('perPage')),
-  skip: (parseInt($scope.getReactively('page')) - 1) * parseInt($scope.getReactively('perPage')),
-  sort: $scope.getReactively('sort')
-}, $scope.getReactively('search')).then(function(){
+    limit: parseInt($scope.getReactively('perPage')),
+    skip: (parseInt($scope.getReactively('page')) - 1) * parseInt($scope.getReactively('perPage')),
+    sort: $scope.getReactively('sort')
+  }, $scope.getReactively('search')).then(function() {
     $scope.partiesCount = $meteor.object(Counts ,'numberOfParties', false);
-  });
 
+    $scope.parties.forEach( function (party) {
+      party.onClicked = function () {
+        onMarkerClicked(party);
+      };
+    });
+
+    $scope.map = {
+      center: {
+        latitude: 45,
+        longitude: -73
+      },
+      zoom: 8
+    };
+
+    var onMarkerClicked = function(marker){
+      $state.go('partyDetails', {partyId: marker._id});
+    }
+
+  });
 });
     
     $scope.remove = function(party){
@@ -145,6 +162,40 @@ $scope.canInvite = function (){
 
   return !$scope.party.public &&
     $scope.party.owner === Meteor.userId();
+};
+
+$scope.map = {
+  center: {
+    latitude: 45,
+    longitude: -73
+  },
+  zoom: 8,
+  events: {
+    click: function (mapModel, eventName, originalEventArgs) {
+      if (!$scope.party)
+        return;
+
+      if (!$scope.party.location)
+        $scope.party.location = {};
+
+      $scope.party.location.latitude = originalEventArgs[0].latLng.lat();
+      $scope.party.location.longitude = originalEventArgs[0].latLng.lng();
+      //scope apply required because this event handler is outside of the angular domain
+      $scope.$apply();
+    }
+  },
+  marker: {
+    options: { draggable: true },
+    events: {
+      dragend: function (marker, eventName, args) {
+        if (!$scope.party.location)
+          $scope.party.location = {};
+
+        $scope.party.location.latitude = marker.getPosition().lat();
+        $scope.party.location.longitude = marker.getPosition().lng();
+      }
+    }
+  }
 };
 
 
