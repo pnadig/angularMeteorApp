@@ -65,11 +65,13 @@ spacebars@1.0.5
 spacebars-compiler@1.0.4
 srp@1.0.2
 templating@1.0.11
+tmeasday:publish-counts@0.3.4
 tracker@1.0.5
 twitter@1.1.3
 ui@1.0.5
 underscore@1.0.2
 urigo:angular@0.7.0
+urigo:angular-utils-pagination@1.0.5
 url@1.0.3
 webapp@1.1.6
 webapp-hashing@1.0.2

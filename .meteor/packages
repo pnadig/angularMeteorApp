@@ -13,3 +13,5 @@ accounts-facebook
 accounts-twitter
 accounts-github
 accounts-google
+urigo:angular-utils-pagination
+tmeasday:publish-counts
