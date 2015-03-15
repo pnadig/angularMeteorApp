@@ -5,7 +5,7 @@ angular.module("socially").controller("PartiesListCtrl", ['$scope', '$meteor', '
 $scope.perPage = 3;
 $scope.sort = { name: 1 };
 
-$meteor.subscribe('users');
+$scope.users = $meteor.collection(Meteor.users, false).subscribe('users');
 
 $scope.orderProperty = '1';
 
@@ -64,8 +64,48 @@ $scope.creator = function(party){
   return owner;
 };
 
+$scope.invite = function(user){
+  $meteor.call('invite', $scope.party._id, user._id).then(
+    function(data){
+      console.log('success inviting', data);
+    },
+    function(err){
+      console.log('failed', err);
+    }
+  );
+};
+
+$scope.rsvp = function(partyId, rsvp){
+  $meteor.call('rsvp', partyId, rsvp).then(
+    function(data){
+      console.log('success responding', data);
+    },
+    function(err){
+      console.log('failed', err);
+    }
+  );
+};
+
+$scope.outstandingInvitations = function (party) {
+
+  return _.filter($scope.users, function (user) {
+    return (_.contains(party.invited, user._id) &&
+      !_.findWhere(party.rsvps, {user: user._id}));
+  });
+};
+
+$scope.canInvite = function (){
+  if (!$scope.party)
+    return false;
+
+  return !$scope.party.public &&
+    $scope.party.owner === Meteor.userId();
+};
+
 
   }])
+
+
 .controller("PartyDetailsCtrl", ['$scope', '$stateParams', '$meteor','$rootScope',
   function($scope, $stateParams,$meteor, $rootScope){
 
@@ -97,6 +137,14 @@ $scope.$on('$destroy', function() {
 
 $scope.reset = function() {
   $scope.party.reset();
+};
+
+$scope.canInvite = function (){
+  if (!$scope.party)
+    return false;
+
+  return !$scope.party.public &&
+    $scope.party.owner === Meteor.userId();
 };
 
 
